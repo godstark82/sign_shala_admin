@@ -1,0 +1,66 @@
+name: "Build & Release"
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: Build & Release
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      # Setup Java
+      - uses: actions/setup-java@v3
+        with:
+          distribution: "zulu"
+          java-version: "18"
+
+      # Setup Flutter
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          architecture: x64
+
+      # Setup Node.js
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "16"
+
+      # Install js-yaml
+      - name: Install js-yaml
+        run: npm install js-yaml
+
+      # Extract version from pubspec.yaml
+      - name: Extract version from pubspec.yaml
+        id: extract_version
+        run: node get-version.js
+
+      # Clean Cache
+      - name: Clean Cache
+        run: flutter clean
+
+      # Get Packages
+      - name: Get Packages
+        run: flutter pub get
+
+      # Build Web
+      - name: Build Web
+        run: flutter build web
+
+      # Adjust Base HREF
+      - name: Adjust Base HREF
+        run: sed -i 's|<base href="/">|<base href="/sign_shala/">|' build/web/index.html
+
+      # Deploy To GitHub Pages
+      - name: Deploy To GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build/web
