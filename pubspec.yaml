@@ -13,6 +13,12 @@ dependencies:
   bloc: ^8.1.4
   flutter_bloc: ^8.1.6
   equatable: ^2.0.5
+  easy_sidemenu: ^0.6.0
+  get: ^4.6.6
+  get_it: ^7.7.0
+  cloud_firestore: ^5.4.0
+  dio: ^5.7.0
+  getwidget: ^4.0.0
 
 dev_dependencies:
   flutter_test:
