@@ -56,7 +56,7 @@ jobs:
 
       # Adjust Base HREF
       - name: Adjust Base HREF
-        run: sed -i 's|<base href="/">|<base href="/sign_shala/">|' build/web/index.html
+        run: sed -i 's|<base href="/">|<base href="/sign_shala_admin/">|' build/web/index.html
 
       # Deploy To GitHub Pages
       - name: Deploy To GitHub Pages
