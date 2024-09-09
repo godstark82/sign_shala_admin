@@ -1,30 +1,32 @@
+import 'dart:developer';
+
 import 'package:admin_sign_shala/features/courses/domain/entities/course_entity.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'subject_model.dart';
 
-class CourseModel extends CourseEntity {
+class CourseModel {
+  String? id;
+  List<SubjectModel>? subjects;
+  List<String>? categories;
+  String? img;
+  DateTime? launchDate;
+  String? longDesc;
+  List<String>? professors;
+  String? shortDesc; //*
+  String? title; //*
+  int? totalStudentsEnrolled;
   CourseModel({
-    int? id,
-    List<SubjectModel>? subjects,
-    List<String>? categories, 
-    String? img, //*
-    DateTime? launchDate, //!
-    String? longDesc, //*
-    List<String>? professors,
-    String? shortDesc, //*
-    String? title, //*
-    int? totalStudentsEnrolled, //!
-  }) : super(
-          id: id,
-          subjects: subjects,
-          categories: categories,
-          img: img,
-          launchDate: launchDate,
-          longDesc: longDesc,
-          professors: professors,
-          shortDesc: shortDesc,
-          title: title,
-          totalStudentsEnrolled: totalStudentsEnrolled,
-        );
+    this.categories,
+    this.img,
+    this.launchDate,
+    this.longDesc,
+    this.professors,
+    this.shortDesc,
+    this.title,
+    this.totalStudentsEnrolled,
+    this.subjects,
+    this.id,
+  });
 
   factory CourseModel.fromJson(Map<String, dynamic> json) {
     return CourseModel(
@@ -43,7 +45,7 @@ class CourseModel extends CourseEntity {
     );
   }
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toJsonBasics() {
     return {
       'id': id,
       'title': title,
@@ -52,16 +54,11 @@ class CourseModel extends CourseEntity {
       'img': img,
       'totalStudentsEnrolled': totalStudentsEnrolled,
       'launchDate': launchDate?.toIso8601String(),
-      'professors': professors,
-      'categories': categories,
-      'subjects': subjects!
-          .map((subject) => (subject as SubjectModel).toJson())
-          .toList(),
     };
   }
 
   CourseModel copyWith({
-    int? id,
+    String? id,
     List<SubjectModel>? subjects,
     List<String>? categories,
     String? img,
@@ -85,5 +82,27 @@ class CourseModel extends CourseEntity {
       totalStudentsEnrolled:
           totalStudentsEnrolled ?? this.totalStudentsEnrolled,
     );
+  }
+
+  // Function to upload course and nested collections to Firestore
+  Future<void> uploadCourseToFirestore() async {
+    CollectionReference courses =
+        FirebaseFirestore.instance.collection('courses');
+
+    try {
+      // 1. Add basic course details to Firestore and get the document reference
+      DocumentReference courseDocRef = await courses.add(toJsonBasics());
+
+      // 2. Add subjects as subcollections under the course document
+      if (subjects != null) {
+        for (SubjectModel subject in subjects! as List<SubjectModel>) {
+          await subject.uploadSubjectToFirestore(courseDocRef);
+        }
+      }
+
+      log('Course uploaded successfully with subjects!');
+    } catch (e) {
+      log('Failed to upload course: $e');
+    }
   }
 }

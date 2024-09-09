@@ -23,18 +23,16 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-      providers: [
-        BlocProvider<HomeBloc>(create: (context) => HomeBloc(sl(), sl())),
-      ],
-      child: GetMaterialApp(
-        title: 'Admin Sign Shala',
-        debugShowCheckedModeBanner: false,
-        home: Home(),
-        getPages: [
-          GetPage(name: Routes.root, page: () => Home()),
-          GetPage(name: Routes.addCourse, page: () => AddNewCoursePage()),
+        providers: [
+          BlocProvider<HomeBloc>(create: (context) => HomeBloc(sl(), sl())),
         ],
-      ),
-    );
+        child: GetMaterialApp(
+            title: 'Admin Sign Shala',
+            debugShowCheckedModeBanner: false,
+            home: Home(),
+            getPages: [
+              GetPage(name: Routes.root, page: () => Home()),
+              GetPage(name: Routes.addCourse, page: () => AddNewCoursePage())
+            ]));
   }
 }

@@ -1,18 +1,19 @@
-import 'package:admin_sign_shala/features/courses/domain/entities/subject_entity.dart';
+import 'dart:developer';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'chapter_model.dart';
 
-class SubjectModel extends SubjectEntity {
+class SubjectModel {
+  String? img;
+  String? shortDesc;
+  String? title;
+  List<ChapterModel>? chapters;
   SubjectModel({
-    String? img,
-    String? shortDesc,
-    String? title,
-    List<ChapterModel>? chapters,
-  }) : super(
-          img: img,
-          shortDesc: shortDesc,
-          title: title,
-          chapters: chapters,
-        );
+    this.chapters,
+    this.img,
+    this.shortDesc,
+    this.title,
+  });
 
   factory SubjectModel.fromJson(Map<String, dynamic> json) {
     return SubjectModel(
@@ -30,9 +31,28 @@ class SubjectModel extends SubjectEntity {
       'img': img,
       'shortDesc': shortDesc,
       'title': title,
-      'chapters': chapters
-          ?.map((chapter) => (chapter as ChapterModel).toJson())
-          .toList(),
+      'chapters': chapters?.map((chapter) => (chapter).toJson()).toList(),
     };
+  }
+
+  // Upload subject to Firestore under a specific course document
+  Future<void> uploadSubjectToFirestore(DocumentReference courseDocRef) async {
+    CollectionReference subjects = courseDocRef.collection('subjects');
+
+    try {
+      DocumentReference subjectDocRef = await subjects.add(toJson());
+
+      // Add chapters as subcollections under the subject document
+      if (chapters != null) {
+        for (ChapterModel chapter in chapters!) {
+          // Assuming all ChapterEntity are actually of type ChapterModel
+          await chapter.uploadChapterToFirestore(subjectDocRef);
+        }
+      }
+
+      log('Subject uploaded successfully with chapters!');
+    } catch (e) {
+      log('Failed to upload subject: $e');
+    }
   }
 }

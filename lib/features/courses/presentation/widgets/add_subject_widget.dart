@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class AddSubjectWidget extends StatefulWidget {
-  const AddSubjectWidget({super.key});
+  final GlobalKey<FormState> formKey;
+  const AddSubjectWidget({super.key, required this.formKey});
 
   @override
   State<AddSubjectWidget> createState() => _AddSubjectWidgetState();
@@ -20,70 +21,77 @@ class _AddSubjectWidgetState extends State<AddSubjectWidget> {
       width: context.width,
       color: Colors.white,
       padding: EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('Subjects (${tempCourse.subjects?.length ?? 0})',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-              IconButton(
-                icon: Icon(Icons.add),
-                onPressed: () {
-                  tempCourse.subjects ??= [];
-                  tempCourse.subjects?.add(SubjectModel());
-                  setState(() {});
-                },
-              )
-            ],
-          ),
-          SizedBox(height: 5),
-          Divider(),
-          SizedBox(height: 10),
-          ListView.separated(
-              shrinkWrap: true,
-              itemCount: tempCourse.subjects?.length ?? 0,
-              separatorBuilder: (context, index) => Divider(
-                    color: Colors.red,
-                  ),
-              itemBuilder: (context, index) {
-                return Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    margin: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.withOpacity(0.5)),
+      child: Form(
+        key: widget.formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Subjects (${tempCourse!.subjects?.length ?? 0})',
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                IconButton(
+                  icon: Icon(Icons.add),
+                  onPressed: () {
+                    tempCourse!.subjects ??= [];
+                    tempCourse!.subjects?.add(SubjectModel());
+                    setState(() {});
+                  },
+                )
+              ],
+            ),
+            SizedBox(height: 5),
+            Divider(),
+            SizedBox(height: 10),
+            ListView.separated(
+                shrinkWrap: true,
+                itemCount: tempCourse!.subjects?.length ?? 0,
+                separatorBuilder: (context, index) => Divider(
+                      color: Colors.red,
                     ),
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            tempCourse.subjects![index].title ?? 'Subject Name',
-                            style: TextStyle(
-                                fontSize: 18, color: Colors.grey.shade900),
-                          ),
-                          SizedBox(height: 10),
-                          CustomTextField(
-                              name: 'Subject Name',
-                              onChanged: (v) => setState(() {
-                                    tempCourse.subjects![index].title = v;
-                                  })),
-                          CustomTextField(
-                              name: 'Description',
-                              onChanged: (v) => setState(() {
-                                    tempCourse.subjects![index].title = v;
-                                  })),
-                          CustomTextField(
-                              name: 'Image (Optional)',
-                              onChanged: (v) => setState(() {
-                                    tempCourse.subjects![index].title = v;
-                                  })),
+                itemBuilder: (context, index) {
+                  return Container(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      margin: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.withOpacity(0.5)),
+                      ),
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              tempCourse!.subjects![index].title ??
+                                  'Subject Name',
+                              style: TextStyle(
+                                  fontSize: 18, color: Colors.grey.shade900),
+                            ),
+                            SizedBox(height: 10),
+                            CustomTextField(
+                                name: 'Subject Name',
+                                onChanged: (v) => setState(() {
+                                      tempCourse!.subjects![index].title = v;
+                                    })),
+                            CustomTextField(
+                                name: 'Description',
+                                onChanged: (v) => setState(() {
+                                      tempCourse!.subjects![index].shortDesc =
+                                          v;
+                                    })),
+                            CustomTextField(
+                                name: 'Image (Optional)',
+                                onChanged: (v) => setState(() {
+                                      tempCourse!.subjects![index].img = v;
+                                    })),
 
-                          //! Chapters Form
-                          AddChapterWidget(index: index),
-                        ]));
-              })
-        ],
+                            //! Chapters Form
+                            AddChapterWidget(index: index),
+                          ]));
+                })
+          ],
+        ),
       ),
     );
   }
